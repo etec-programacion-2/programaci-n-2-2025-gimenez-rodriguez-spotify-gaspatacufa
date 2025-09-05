@@ -7,15 +7,8 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
 fun main() {
-    embeddedServer(Netty) {
-        module()
-    }.start(wait = true)
-}
-
-fun Application.module() {
-    routing {
-        get("/hello") {
-            call.respondText("Hola, el server Ktor anda perfecto 🚀")
-        }
-    }
+    val client = HttpClient(CIO)
+    val response: HttpResponse = client.get("https://ktor.io/")
+    println(response.status)
+    client.close()
 }

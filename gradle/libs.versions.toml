@@ -4,6 +4,7 @@
 [versions]
 guava = "33.4.6-jre"
 junit-jupiter-engine = "5.12.1"
+ktor_version = "3.2.3"
 
 [libraries]
 guava = { module = "com.google.guava:guava", version.ref = "guava" }

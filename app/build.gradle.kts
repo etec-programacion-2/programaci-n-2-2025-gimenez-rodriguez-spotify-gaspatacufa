@@ -1,19 +1,17 @@
 plugins {
-    kotlin("jvm") version "1.9.25"
+    kotlin("jvm")
     application
 }
 
 repositories {
     mavenCentral()
+//    maven { url = uri("https://maven.pkg.jetbrains.space/public/p/ktor/eap") }
 }
 
-val ktor_version = "2.3.4"
-
 dependencies {
-    implementation("io.ktor:ktor-server-core:$ktor_version")
-    implementation("io.ktor:ktor-server-netty:$ktor_version")
-    implementation("ch.qos.logback:logback-classic:1.4.11")
-    testImplementation(kotlin("test"))
+    implementation("io.ktor:ktor-client-core:${ktor_version}")
+    implementation("io.ktor:ktor-client-cio:${ktor_version}")
+    implementation("ch.qos.logback:logback-classic:${logback_version}")
 }
 
 application {
@@ -24,3 +22,4 @@ application {
 kotlin {
     jvmToolchain(21)
 }
+
