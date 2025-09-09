@@ -10,5 +10,5 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
-rootProject.name = "programaci-n-2-2025-gimenez-rodriguez-spotify-gaspatacufa"
+rootProject.name = "2025-ktor-client"
 include("app")
