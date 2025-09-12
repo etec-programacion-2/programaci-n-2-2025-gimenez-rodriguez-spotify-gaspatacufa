@@ -13,26 +13,6 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import java.util.*
 
-@Serializable
-data class Artist(
-    val id: String,
-    val name: String,
-    val genres: List<String> = emptyList(),
-    val popularity: Int = 0,
-    val followers: Followers? = null
-)
-
-@Serializable
-data class Followers(
-    val total: Int
-)
-
-@Serializable
-data class TokenResponse(
-    @SerialName("access_token") val accessToken: String,
-    @SerialName("token_type") val tokenType: String,
-    @SerialName("expires_in") val expiresIn: Int
-)
 
 suspend fun main() {
     // ⚠️ REEMPLAZA CON TUS CREDENCIALES REALES
@@ -74,7 +54,11 @@ suspend fun main() {
         // Paso 2: Usar el token para obtener información del artista
         println("\n🎵 Obteniendo información del artista...")
         
-        val artist: Artist = client.get("https://api.spotify.com/v1/artists/0TnOYISbd1XYRBk9myaseg") {
+        val artistId = "06HL4z0CvFAxyc27GXpf02" // ID de Bad Bunny
+        val url = "https://api.spotify.com/v1/artists/$artistId"
+        println("URL de la solicitud: $url")
+
+        val artist: Artist = client.get(url) {
             headers {
                 append(HttpHeaders.Authorization, "${tokenResponse.tokenType} ${tokenResponse.accessToken}")
             }
