@@ -13,10 +13,17 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import java.util.*
 
-
 @Serializable
-data class TokenResponse(
-    @SerialName("access_token") val accessToken: String,
-    @SerialName("token_type") val tokenType: String,
-    @SerialName("expires_in") val expiresIn: Int
+data class Playlist(
+    val id: String,
+    val name: String,
+    val description: String? = null,
+    val owner: PlaylistOwner,
+    val public: Boolean? = null,
+    val collaborative: Boolean = false,
+    val followers: Followers,
+    val images: List<Image> = emptyList(),
+    @SerialName("external_urls") val externalUrls: ExternalUrls? = null,
+    @SerialName("snapshot_id") val snapshotId: String,
+    val tracks: PlaylistTrackList
 )

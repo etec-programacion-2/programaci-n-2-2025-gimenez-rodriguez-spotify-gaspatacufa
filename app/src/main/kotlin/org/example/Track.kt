@@ -14,12 +14,17 @@ import kotlinx.serialization.json.Json
 import java.util.*
 
 @Serializable
-data class Artist(
+data class Track(
     val id: String,
     val name: String,
-    val genres: List<String> = emptyList(),
+    val artists: List<SimpleArtist>,
+    val album: SimpleAlbum,
+    @SerialName("duration_ms") val durationMs: Long,
+    val explicit: Boolean = false,
     val popularity: Int = 0,
-    val followers: Followers? = null,
-    val images: List<Image> = emptyList(),
+    @SerialName("preview_url") val previewUrl: String? = null,
+    @SerialName("track_number") val trackNumber: Int = 1,
+    @SerialName("disc_number") val discNumber: Int = 1,
+    @SerialName("is_local") val isLocal: Boolean = false,
     @SerialName("external_urls") val externalUrls: ExternalUrls? = null
 )
