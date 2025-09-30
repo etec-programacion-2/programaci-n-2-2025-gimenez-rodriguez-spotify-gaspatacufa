@@ -1,51 +1,170 @@
 package org.example
 
-/**
- * Clase que demuestra el uso de la capa de abstracción sobre la API de Spotify.
- * Implementa el principio de Inversión de Dependencias programando contra interfaces,
- * no contra implementaciones concretas.
- */
-class SpotifyService(
-    private val searchRepository: SearchRepository,
-    private val trackRepository: TrackRepository
-) {
-    
-    /**
-     * Busca y muestra información de tracks
-     */
-    suspend fun searchAndDisplayTracks(query: String, limit: Int = 5) {
-        println("\n🔍 Buscando tracks: '$query'")
-        try {
-            val tracks = searchRepository.searchTracks(query, limit)
-            if (tracks.isNotEmpty()) {
-                println("✅ Encontrados ${tracks.size} tracks:")
-                tracks.forEach { track ->
-                    println("  • ${track.name} - ${track.artists.joinToString(", ") { it.name }}")
-                }
-            } else {
-                println("❌ No se encontraron tracks para: '$query'")
-            }
-        } catch (e: SpotifyApiException) {
-            println("❌ Error al buscar tracks: ${e.message}")
+
+
+
+
+import io.ktor.client.statement.*
+import kotlinx.coroutines.*
+import io.ktor.client.*
+import io.ktor.client.call.*
+import io.ktor.client.engine.cio.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.request.*
+import io.ktor.client.request.forms.*
+import io.ktor.http.*
+import io.ktor.serialization.kotlinx.json.*
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import java.util.*
+
+
+@Serializable
+data class TokenResponse(
+    @SerialName("access_token") val accessToken: String,
+    @SerialName("token_type") val tokenType: String,
+    @SerialName("expires_in") val expiresIn: Int
+)
+
+@Serializable
+data class Followers(
+    val total: Int
+)
+
+@Serializable
+data class TrackList(
+    val href: String,
+    val limit: Int,
+    val next: String? = null,
+    val offset: Int,
+    val previous: String? = null,
+    val total: Int,
+    val items: List<SimpleTrack> = emptyList()
+)
+
+@Serializable
+data class SimpleTrack(
+    val id: String,
+    val name: String,
+    val artists: List<SimpleArtist>,
+    @SerialName("duration_ms") val durationMs: Long,
+    val explicit: Boolean = false,
+    @SerialName("track_number") val trackNumber: Int,
+    @SerialName("disc_number") val discNumber: Int = 1,
+    @SerialName("preview_url") val previewUrl: String? = null,
+    @SerialName("external_urls") val externalUrls: ExternalUrls? = null
+)
+
+@Serializable
+data class Copyright(
+    val text: String,
+    val type: String
+)
+
+@Serializable
+data class PlaylistOwner(
+    val id: String,
+    @SerialName("display_name") val displayName: String? = null,
+    @SerialName("external_urls") val externalUrls: ExternalUrls? = null,
+    val followers: Followers? = null,
+    val images: List<Image> = emptyList()
+)
+
+@Serializable
+data class PlaylistTrackList(
+    val href: String,
+    val limit: Int,
+    val next: String? = null,
+    val offset: Int,
+    val previous: String? = null,
+    val total: Int,
+    val items: List<PlaylistTrackItem> = emptyList()
+)
+
+@Serializable
+data class PlaylistTrackItem(
+    @SerialName("added_at") val addedAt: String? = null,
+    @SerialName("added_by") val addedBy: PlaylistOwner? = null,
+    @SerialName("is_local") val isLocal: Boolean = false,
+    val track: PlaylistTrack? = null
+)
+
+@Serializable
+data class PlaylistTrack(
+    val id: String? = null,
+    val name: String,
+    val artists: List<SimpleArtist>,
+    val album: SimpleAlbum? = null,
+    @SerialName("duration_ms") val durationMs: Long,
+    val explicit: Boolean = false,
+    val popularity: Int = 0,
+    @SerialName("preview_url") val previewUrl: String? = null,
+    @SerialName("external_urls") val externalUrls: ExternalUrls? = null,
+    @SerialName("is_local") val isLocal: Boolean = false
+)
+
+@Serializable
+data class SimpleArtist(
+    val id: String,
+    val name: String,
+    @SerialName("external_urls") val externalUrls: ExternalUrls? = null
+)
+
+@Serializable
+data class SimpleAlbum(
+    val id: String,
+    val name: String,
+    @SerialName("album_type") val albumType: String,
+    val artists: List<SimpleArtist>,
+    @SerialName("release_date") val releaseDate: String? = null,
+    @SerialName("total_tracks") val totalTracks: Int = 0,
+    val images: List<Image> = emptyList(),
+    @SerialName("external_urls") val externalUrls: ExternalUrls? = null
+)
+
+@Serializable
+data class Image(
+    val url: String,
+    val height: Int? = null,
+    val width: Int? = null
+)
+
+@Serializable
+data class ExternalUrls(
+    val spotify: String
+)
+
+class SpotifyApiClient(private val clientId: String, private val clientSecret: String) {
+    private val client = HttpClient(CIO) {
+        install(ContentNegotiation) {
+            json(Json {
+                prettyPrint = true
+                isLenient = true
+                ignoreUnknownKeys = true
+            })
         }
     }
     
-    /**
-     * Busca y muestra información de artistas
-     */
-    suspend fun searchAndDisplayArtists(query: String, limit: Int = 5) {
-        println("\n🔍 Buscando artistas: '$query'")
-        try {
-            val artists = searchRepository.searchArtists(query, limit)
-            if (artists.isNotEmpty()) {
-                println("✅ Encontrados ${artists.size} artistas:")
-                artists.forEach { artist ->
-                    val genres = if (artist.genres.isNotEmpty()) 
-                        " (${artist.genres.take(2).joinToString(", ")})" 
-                    else ""
-                    println("  • ${artist.name}$genres - Popularidad: ${artist.popularity}/100")
+    private var accessToken: String? = null
+    private var tokenType: String? = null
+    
+    suspend fun authenticate(): Any {
+        return try {
+            println("🔑 Obteniendo access token...")
+            val credentials = Base64.getEncoder().encodeToString("$clientId:$clientSecret".toByteArray())
+            
+            val tokenResponse: HttpResponse = client.submitForm(
+                url = "https://accounts.spotify.com/api/token",
+                formParameters = parameters {
+                    append("grant_type", "client_credentials")
                 }
-            } else {
+            ) {
+                headers {
+                    append(HttpHeaders.Authorization, "Basic $credentials")
+                    append(HttpHeaders.ContentType, "application/x-www-form-urlencoded")
+                }
+            } else  {
                 println("❌ No se encontraron artistas para: '$query'")
             }
         } catch (e: SpotifyApiException) {
@@ -124,70 +243,32 @@ class SpotifyService(
 }
 
 suspend fun main() {
-    // ⚠️ REEMPLAZA CON TUS CREDENCIALES REALES
     val clientId = "43551abad28b4f9290ed67904ee20f5e"
     val clientSecret = "dd2408b1ccae4bdca9fd71735f6649eb"
-    
-    // PASO 1: Crear el servicio de autenticación (implementación concreta)
-    val authService: AuthService = SpotifyAuthService(clientId, clientSecret)
-    
-    // PASO 2: Crear los repositorios inyectando la dependencia (Inyección de Dependencias)
-    val searchRepository: SearchRepository = SpotifySearchRepository(authService)
-    val trackRepository: TrackRepository = SpotifyTrackRepository(authService)
-    
-    // PASO 3: Crear el servicio principal que programa contra interfaces (DIP)
-    val spotifyService = SpotifyService(searchRepository, trackRepository)
-    
-    try {
-        println("=".repeat(70))
-        println("🎼 DEMO DE CAPA DE ABSTRACCIÓN SOBRE API DE SPOTIFY")
-        println("=".repeat(70))
-        println("📚 Principios implementados:")
-        println("  • Inversión de Dependencias (DIP): Programamos contra interfaces")
-        println("  • Inyección de Dependencias: Los repositorios reciben AuthService")
-        println("  • Separación de responsabilidades: Cada clase tiene una función específica")
-        println("=".repeat(70))
-        
-        // DEMOSTRACIÓN DE BÚSQUEDAS
-        spotifyService.searchAndDisplayTracks("Bohemian Rhapsody", 3)
-        spotifyService.searchAndDisplayArtists("Queen", 3)
-        spotifyService.searchAndDisplayAlbums("A Night at the Opera", 3)
-        
-        // DEMOSTRACIÓN DE OPERACIONES ESPECÍFICAS DE TRACKS
-        val trackId = "4u7EnebtmKWzUH433cf5Qv" // Bohemian Rhapsody
-        spotifyService.getAndDisplayTrackDetails(trackId)
-        
-        val artistId = "1dfeR4HaWDbWqFHLkxsg1d" // Queen
-        spotifyService.getAndDisplayArtistTopTracks(artistId)
-        
-        println("\n" + "=".repeat(70))
-        println("✅ DEMOSTRACIÓN COMPLETADA EXITOSAMENTE")
-        println("🏗️ La capa de abstracción oculta la complejidad de la API")
-        println("🔌 Los repositorios son intercambiables sin cambiar el código cliente")
-        println("🧪 El código es fácil de testear usando mocks de las interfaces")
-        println("=".repeat(70))
-        
-    } catch (e: Exception) {
-        println("❌ Error general: ${e.message}")
-        e.printStackTrace()
-    } finally {
-        // Cerrar recursos si es necesario
-        if (authService is SpotifyAuthService) {
-            authService.close()
-        }
-        if (searchRepository is SpotifySearchRepository) {
-            searchRepository.close()
-        }
-        if (trackRepository is SpotifyTrackRepository) {
-            trackRepository.close()
-        }
-    }
-}
 
-// Función utilitaria reutilizada
-private fun formatDuration(durationMs: Long): String {
-    val totalSeconds = durationMs / 1000
-    val minutes = totalSeconds / 60
-    val seconds = totalSeconds % 60
-    return "${minutes}:${seconds.toString().padStart(2, '0')}"
+    val authService = SpotifyAuthService(clientId, clientSecret)
+    if (!authService.authenticate()) {
+        println("❌ No se pudo obtener el token de acceso")
+        return
+    }
+
+    val searchRepository: SearchRepository = SpotifySearchRepository(authService)
+
+    // Ejemplo de búsqueda de tracks
+    val tracks = searchRepository.searchTracks("Imagine Dragons")
+    println("Tracks encontrados: ${tracks.size}")
+    tracks.forEach { track ->
+        println("- ${track.name} por ${track.artists.joinToString { it.name }}")
+    }
+
+    // Ejemplo de búsqueda de artistas
+    val artists = searchRepository.searchArtists("Adele")
+    println("Artistas encontrados: ${artists.size}")
+    artists.forEach { artist ->
+        println("- ${artist.name}")
+    }
+
+    // Cerrar clientes HTTP
+    (searchRepository as? SpotifySearchRepository)?.close()
+    authService.close()
 }
