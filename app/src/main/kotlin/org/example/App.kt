@@ -11,7 +11,12 @@ import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import java.io.File
 import java.util.*
+
+
+
+
 
 
 @Serializable
@@ -311,8 +316,43 @@ fun printPlaylistInfo(playlist: Playlist) {
 
 }
 
+fun leerIdsDeArchivo(archivo: String): List<String> {
+    val file = File(archivo)
+    if (!file.exists()) {
+        println("❌ El archivo $archivo no se encuentra en la ruta especificada.")
+        return emptyList()  // Retorna una lista vacía si el archivo no existe
+    }
+    return file.readLines()  // Lee todas las líneas del archivo y las devuelve como una lista
+}
+
+fun seleccionarIdAleatorio(archivo: String): String? {
+    val ids = leerIdsDeArchivo(archivo)
+    return if (ids.isNotEmpty()) {
+        ids.random()  // Selecciona un ID aleatorio
+    } else {
+        null  // Si el archivo está vacío, retorna null
+    }
+}
+
 
 suspend fun main() {
+
+    val archivoArtistas = "/home/etec/programaci-n-2-2025-gimenez-rodriguez-spotify-gaspatacufa/data/artistas.txt"
+    val archivoPistas = "/home/etec/programaci-n-2-2025-gimenez-rodriguez-spotify-gaspatacufa/data/pistas.txt"
+    val archivoAlbumes = "/home/etec/programaci-n-2-2025-gimenez-rodriguez-spotify-gaspatacufa/data/albumes.txt"
+    val archivoPlaylists = "/home/etec/programaci-n-2-2025-gimenez-rodriguez-spotify-gaspatacufa/data/playlists.txt"
+
+    val artistaSeleccionado = seleccionarIdAleatorio(archivoArtistas) ?: "ID predeterminado de artista"
+    val pistaSeleccionada = seleccionarIdAleatorio(archivoPistas) ?: "ID predeterminado de pista"
+    val albumSeleccionado = seleccionarIdAleatorio(archivoAlbumes) ?: "ID predeterminado de álbum"
+    val playlistSeleccionada = seleccionarIdAleatorio(archivoPlaylists) ?: "ID predeterminado de playlist"
+
+
+    println("Artista seleccionado: $artistaSeleccionado")
+    println("Pista seleccionada: $pistaSeleccionada")
+    println("Álbum seleccionado: $albumSeleccionado")
+    println("Playlist seleccionada: $playlistSeleccionada")
+
     // ⚠️ REEMPLAZA CON TUS CREDENCIALES REALES
     val clientId = "43551abad28b4f9290ed67904ee20f5e"
     val clientSecret = "dd2408b1ccae4bdca9fd71735f6649eb"
@@ -331,10 +371,10 @@ suspend fun main() {
         println("=".repeat(70))
         
         // IDs de ejemplo para las consultas
-        val artistId = "0TnOYISbd1XYRBk9myaseg"     
-        val trackId = "4u7EnebtmKWzUH433cf5Qv"      
-        val albumId = "4aawyAB9vmqN3uQ7FjRGTy"      
-        val playlistId = "3cEYpjA9oz9GiPac4AsH4n"   
+        val artistId = artistaSeleccionado     
+        val trackId = pistaSeleccionada      
+        val albumId = albumSeleccionado      
+        val playlistId = playlistSeleccionada   
         
         // Paso 2: Obtener información del artista
         spotifyClient.getArtist(artistId)?.let { artist ->
