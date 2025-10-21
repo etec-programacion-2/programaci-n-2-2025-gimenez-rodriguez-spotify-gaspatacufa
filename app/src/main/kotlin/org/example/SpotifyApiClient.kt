@@ -15,6 +15,7 @@ import java.io.File
 import java.util.*
 
 class SpotifyApiClient(private val clientId: String, private val clientSecret: String) {
+    
     private val client = HttpClient(CIO) {
         install(ContentNegotiation) {
             json(Json {
