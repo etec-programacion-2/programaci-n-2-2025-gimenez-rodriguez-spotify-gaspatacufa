@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Buscador Spotify</title>
+</head>
+<body>
+    <h1>Buscar info</h1>
+        
+    <h2>Buscar artista</h2>
+    <form action="/api/artista" method="get">
+        <label>Nombre del artista:</label><br>
+        <input type="text" name="nombre" placeholder="Ej: Bad Bunny" required><br>
+        <button type="submit">Buscar</button>
+    </form>
+    
+
+    
+    <h2>Buscar cancion</h2>
+    <form action="/api/track" method="get">
+        <label>Nombre de la canción:</label><br>
+        <input type="text" name="nombre" placeholder="Ej: Monaco" required><br>
+        <button type="submit">Buscar</button>
+    </form>
+    
+
+    
+    <h2>Buscar album</h2>
+    <form action="/api/album" method="get">
+        <label>Nombre del álbum:</label><br>
+        <input type="text" name="nombre" placeholder="Ej: YHLQMDLG" required><br>
+        <button type="submit">Buscar</button>
+    </form>
+    
+
+    
+    <h2>Buscar playlist</h2>
+    <form action="/api/playlist" method="get">
+        <label>Nombre de la playlist:</label><br>
+        <input type="text" name="nombre" placeholder="Ej: Reggaeton Hits" required><br>
+        <button type="submit">Buscar</button>
+    </form>
+    
+
+</body>
+</html>
