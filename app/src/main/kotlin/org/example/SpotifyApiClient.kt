@@ -6,23 +6,25 @@ import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import java.io.File
 import java.util.*
 
-class SpotifyApiClient(private val clientId: String, private val clientSecret: String) {
+class SpotifyApiClient(val clientId: String, val clientSecret: String) {
+    
+    private val jsonParser = Json {
+        prettyPrint = true
+        isLenient = true
+        ignoreUnknownKeys = true
+    }
     
     private val client = HttpClient(CIO) {
         install(ContentNegotiation) {
-            json(Json {
-                prettyPrint = true
-                isLenient = true
-                ignoreUnknownKeys = true
-            })
+            json(jsonParser)
         }
     }
     
@@ -49,79 +51,131 @@ class SpotifyApiClient(private val clientId: String, private val clientSecret: S
             accessToken = tokenResponse.accessToken
             tokenType = tokenResponse.tokenType
             
-            println("Token obtenido exitosamente")
+            println("✅ Token obtenido exitosamente")
             println("Expires in: ${tokenResponse.expiresIn} seconds")
             true
         } catch (e: Exception) {
-            println("Error al obtener token: ${e.message}")
+            println("❌ Error al obtener token: ${e.message}")
             false
         }
     }
     
     suspend fun getArtist(artistId: String): Artist? {
         return try {
-            println("\nObteniendo informacion del artista...")
-            val artist: Artist = client.get("https://api.spotify.com/v1/artists/$artistId") {
+            println("\n🔍 Obteniendo informacion del artista...")
+            println("   ID solicitado: '$artistId'")
+            
+            val response: HttpResponse = client.get("https://api.spotify.com/v1/artists/$artistId") {
                 headers {
                     append(HttpHeaders.Authorization, "$tokenType $accessToken")
                 }
-            }.body()
+            }
             
-            println("✅ Artista obtenido: ${artist.name}")
-            artist
+            val responseBody = response.bodyAsText()
+            println("   Status: ${response.status.value} ${response.status.description}")
+            println("   Respuesta: ${responseBody.take(300)}")
+            
+            if (response.status.isSuccess()) {
+                val artist = jsonParser.decodeFromString<Artist>(responseBody)
+                println("✅ Artista obtenido: ${artist.name}")
+                artist
+            } else {
+                println("❌ Error HTTP ${response.status.value}")
+                null
+            }
         } catch (e: Exception) {
-            println("Error al obtener artista: ${e.message}")
+            println("❌ Error: ${e.message}")
+            e.printStackTrace()
             null
         }
     }
     
     suspend fun getTrack(trackId: String): Track? {
         return try {
-            println("\nObteniendo informacion de la cancion...")
-            val track: Track = client.get("https://api.spotify.com/v1/tracks/$trackId") {
+            println("\n🔍 Obteniendo informacion de la cancion...")
+            println("   ID solicitado: '$trackId'")
+            
+            val response: HttpResponse = client.get("https://api.spotify.com/v1/tracks/$trackId") {
                 headers {
                     append(HttpHeaders.Authorization, "$tokenType $accessToken")
                 }
-            }.body()
+            }
             
-            println("Cancion obtenida: ${track.name}")
-            track
+            val responseBody = response.bodyAsText()
+            println("   Status: ${response.status.value} ${response.status.description}")
+            println("   Respuesta: ${responseBody.take(300)}")
+            
+            if (response.status.isSuccess()) {
+                val track = jsonParser.decodeFromString<Track>(responseBody)
+                println("✅ Cancion obtenida: ${track.name}")
+                track
+            } else {
+                println("❌ Error HTTP ${response.status.value}")
+                null
+            }
         } catch (e: Exception) {
-            println("Error al obtener cancion: ${e.message}")
+            println("❌ Error: ${e.message}")
+            e.printStackTrace()
             null
         }
     }
     
     suspend fun getAlbum(albumId: String): Album? {
         return try {
-            println("\nObteniendo informacion del album...")
-            val album: Album = client.get("https://api.spotify.com/v1/albums/$albumId") {
+            println("\n🔍 Obteniendo informacion del album...")
+            println("   ID solicitado: '$albumId'")
+            
+            val response: HttpResponse = client.get("https://api.spotify.com/v1/albums/$albumId") {
                 headers {
                     append(HttpHeaders.Authorization, "$tokenType $accessToken")
                 }
-            }.body()
+            }
             
-            println("Album obtenido: ${album.name}")
-            album
+            val responseBody = response.bodyAsText()
+            println("   Status: ${response.status.value} ${response.status.description}")
+            println("   Respuesta: ${responseBody.take(300)}")
+            
+            if (response.status.isSuccess()) {
+                val album = jsonParser.decodeFromString<Album>(responseBody)
+                println("✅ Album obtenido: ${album.name}")
+                album
+            } else {
+                println("❌ Error HTTP ${response.status.value}")
+                null
+            }
         } catch (e: Exception) {
-            println("Error al obtener album: ${e.message}")
+            println("❌ Error: ${e.message}")
+            e.printStackTrace()
             null
         }
     }
     
     suspend fun getPlaylist(playlistId: String): Playlist? {
         return try {
-            println("\nObteniendo informacion de la playlist...")
-            val playlist: Playlist = client.get("https://api.spotify.com/v1/playlists/$playlistId") {
+            println("\n🔍 Obteniendo informacion de la playlist...")
+            println("   ID solicitado: '$playlistId'")
+            
+            val response: HttpResponse = client.get("https://api.spotify.com/v1/playlists/$playlistId") {
                 headers {
                     append(HttpHeaders.Authorization, "$tokenType $accessToken")
                 }
-            }.body()
+            }
             
-            println("Playlist obtenida: ${playlist.name}")
-            playlist
+            val responseBody = response.bodyAsText()
+            println("   Status: ${response.status.value} ${response.status.description}")
+            
+            if (response.status.isSuccess()) {
+                val playlist = jsonParser.decodeFromString<Playlist>(responseBody)
+                println("✅ Playlist obtenida: ${playlist.name}")
+                playlist
+            } else {
+                println("❌ Error HTTP ${response.status.value}")
+                println("   Respuesta: ${responseBody.take(300)}")
+                null
+            }
         } catch (e: Exception) {
-            println("Error al obtener playlist: ${e.message}")
+            println("❌ Error: ${e.message}")
+            e.printStackTrace()
             null
         }
     }

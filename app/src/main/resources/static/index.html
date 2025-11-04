@@ -1,46 +1,38 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Buscador Spotify</title>
+<!DOCTYPE html> 
+<html lang="es"> <!-- inicia html con idioma español -->
+<head> <!-- seccion head con metadata -->
+    <meta charset="UTF-8"> <!-- codificacion de caracteres utf-8 -->
+    <title>Buscador Spotify</title> <!-- titulo de la pagina -->
 </head>
-<body>
-    <h1>Buscar info</h1>
+<body> <!-- cuerpo de la pagina -->
+    <h1>Buscar info</h1> <!-- titulo principal -->
         
-    <h2>Buscar artista</h2>
-    <form action="/api/artista" method="get">
-        <label>Nombre del artista:</label><br>
-        <input type="text" name="nombre" placeholder="Ej: Bad Bunny" required><br>
-        <button type="submit">Buscar</button>
+    <h2>Buscar artista</h2> <!-- subtitulo para seccion de artistas -->
+    <form action="/api/artista" method="get"> <!-- formulario que envia datos a /api/artista por metodo get -->
+        <label>Nombre del artista:</label><br> <!-- etiqueta del campo -->
+        <input type="text" name="nombre" placeholder="Ej: Bad Bunny" required><br> <!-- campo de texto con nombre "nombre", placeholder de ejemplo, y requerido -->
+        <button type="submit">Buscar</button> <!-- boton para enviar formulario -->
     </form>
     
-
-    
-    <h2>Buscar cancion</h2>
-    <form action="/api/track" method="get">
-        <label>Nombre de la canción:</label><br>
-        <input type="text" name="nombre" placeholder="Ej: La Droga" required><br>
-        <button type="submit">Buscar</button>
+    <h2>Buscar cancion</h2> <!-- subtitulo para seccion de canciones -->
+    <form action="/api/track" method="get"> <!-- formulario para buscar canciones -->
+        <label>Nombre de la canción:</label><br> <!-- etiqueta -->
+        <input type="text" name="nombre" placeholder="Ej: La Droga" required><br> <!-- campo de texto -->
+        <button type="submit">Buscar</button> <!-- boton enviar -->
     </form>
     
-
-    
-    <h2>Buscar album</h2>
-    <form action="/api/album" method="get">
-        <label>Nombre del álbum:</label><br>
-        <input type="text" name="nombre" placeholder="Ej: Ameri" required><br>
-        <button type="submit">Buscar</button>
+    <h2>Buscar album</h2> <!-- subtitulo para seccion de albumes -->
+    <form action="/api/album" method="get"> <!-- formulario para buscar albumes -->
+        <label>Nombre del álbum:</label><br> <!-- etiqueta -->
+        <input type="text" name="nombre" placeholder="Ej: Ameri" required><br> <!-- campo de texto -->
+        <button type="submit">Buscar</button> <!-- boton enviar -->
     </form>
     
-
-    
-    <h2>Buscar playlist</h2>
-    <form action="/api/playlist" method="get">
-        <label>Nombre de la playlist:</label><br>
-        <input type="text" name="nombre" placeholder="Ej: 0600" required><br>
-        <button type="submit">Buscar</button>
+    <h2>Buscar playlist</h2> <!-- subtitulo para seccion de playlists -->
+    <form action="/api/playlist" method="get"> <!-- formulario para buscar playlists -->
+        <label>Nombre de la playlist:</label><br> <!-- etiqueta -->
+        <input type="text" name="nombre" placeholder="Ej: 0600" required><br> <!-- campo de texto -->
+        <button type="submit">Buscar</button> <!-- boton enviar -->
     </form>
-    
-
 </body>
 </html>

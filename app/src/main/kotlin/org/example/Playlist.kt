@@ -1,29 +1,19 @@
 package org.example
 
-import io.ktor.client.*
-import io.ktor.client.call.*
-import io.ktor.client.engine.cio.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.client.request.*
-import io.ktor.client.request.forms.*
-import io.ktor.http.*
-import io.ktor.serialization.kotlinx.json.*
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
-import java.util.*
+import kotlinx.serialization.SerialName // importa anotacion para mapear nombres json
+import kotlinx.serialization.Serializable // importa anotacion para hacer la clase serializable
 
-@Serializable
-data class Playlist(
-    val id: String,
-    val name: String,
-    val description: String? = null,
-    val owner: PlaylistOwner,
-    val public: Boolean? = null,
-    val collaborative: Boolean = false,
-    val followers: Followers,
-    val images: List<Image> = emptyList(),
-    @SerialName("external_urls") val externalUrls: ExternalUrls? = null,
-    @SerialName("snapshot_id") val snapshotId: String,
-    val tracks: PlaylistTrackList
+@Serializable // marca que esta clase puede convertirse a/desde json
+data class Playlist( // clase que representa una playlist
+    val id: String, // id unico de la playlist
+    val name: String, // nombre de la playlist
+    val description: String? = null, // descripcion de la playlist, puede ser null
+    val owner: PlaylistOwner, // dueño de la playlist
+    val public: Boolean? = null, // indica si es publica, puede ser null
+    val collaborative: Boolean = false, // indica si es colaborativa, por defecto false
+    val followers: Followers, // seguidores de la playlist
+    val images: List<Image> = emptyList(), // lista de imagenes, por defecto vacia
+    @SerialName("external_urls") val externalUrls: ExternalUrls? = null, // urls externas, puede ser null
+    @SerialName("snapshot_id") val snapshotId: String, // id de la version actual de la playlist
+    val tracks: PlaylistTrackList // lista de canciones de la playlist
 )

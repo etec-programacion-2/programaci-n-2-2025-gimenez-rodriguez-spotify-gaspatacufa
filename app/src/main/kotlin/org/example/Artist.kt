@@ -1,25 +1,15 @@
 package org.example
 
-import io.ktor.client.*
-import io.ktor.client.call.*
-import io.ktor.client.engine.cio.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.client.request.*
-import io.ktor.client.request.forms.*
-import io.ktor.http.*
-import io.ktor.serialization.kotlinx.json.*
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
-import java.util.*
+import kotlinx.serialization.SerialName // importa anotacion para mapear nombres json
+import kotlinx.serialization.Serializable // importa anotacion para hacer la clase serializable
 
-@Serializable
-data class Artist(
-    val id: String,
-    val name: String,
-    val genres: List<String> = emptyList(),
-    val popularity: Int = 0,
-    val followers: Followers? = null,
-    val images: List<Image> = emptyList(),
-    @SerialName("external_urls") val externalUrls: ExternalUrls? = null
+@Serializable // marca que esta clase puede convertirse a/desde json
+data class Artist( // clase que representa un artista
+    val id: String, // id unico del artista en spotify
+    val name: String, // nombre del artista
+    val genres: List<String> = emptyList(), // lista de generos musicales, por defecto vacia
+    val popularity: Int = 0, // popularidad de 0 a 100, por defecto 0
+    val followers: Followers? = null, // seguidores del artista, puede ser null
+    val images: List<Image> = emptyList(), // lista de imagenes del artista, por defecto vacia
+    @SerialName("external_urls") val externalUrls: ExternalUrls? = null // urls externas como spotify, puede ser null
 )
