@@ -1,23 +1,12 @@
 package org.example
 
-import io.ktor.client.*
-import io.ktor.client.call.*
-import io.ktor.client.engine.cio.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.client.request.*
-import io.ktor.client.request.forms.*
-import io.ktor.http.*
-import io.ktor.serialization.kotlinx.json.*
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
-import java.io.File
-import java.util.*
+import kotlinx.serialization.SerialName // importa anotacion para mapear nombres json
+import kotlinx.serialization.Serializable // importa anotacion para hacer la clase serializable
 
-@Serializable
-data class PlaylistTrackItem(
-    @SerialName("added_at") val addedAt: String? = null,
-    @SerialName("added_by") val addedBy: PlaylistOwner? = null,
-    @SerialName("is_local") val isLocal: Boolean = false,
-    val track: PlaylistTrack? = null
+@Serializable // marca que esta clase puede convertirse a/desde json
+data class PlaylistTrackItem( // item que contiene una cancion en una playlist
+    @SerialName("added_at") val addedAt: String? = null, // fecha cuando se agrego, puede ser null
+    @SerialName("added_by") val addedBy: PlaylistOwner? = null, // quien la agrego, puede ser null
+    @SerialName("is_local") val isLocal: Boolean = false, // indica si es archivo local, por defecto false
+    val track: PlaylistTrack? = null // la cancion, puede ser null
 )

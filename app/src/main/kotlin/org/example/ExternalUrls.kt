@@ -14,7 +14,7 @@ import kotlinx.serialization.json.Json
 import java.io.File
 import java.util.*
 
-@Serializable
-data class ExternalUrls(
-    val spotify: String
-)
+@Serializable // marca que esta clase puede convertirse a/desde json
+data class ExternalUrls( // urls externas
+    val spotify: String)    
+                        // url de spotify

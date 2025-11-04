@@ -1,27 +1,16 @@
 package org.example
 
-import io.ktor.client.*
-import io.ktor.client.call.*
-import io.ktor.client.engine.cio.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.client.request.*
-import io.ktor.client.request.forms.*
-import io.ktor.http.*
-import io.ktor.serialization.kotlinx.json.*
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
-import java.io.File
-import java.util.*
+import kotlinx.serialization.SerialName // importa anotacion para mapear nombres json
+import kotlinx.serialization.Serializable // importa anotacion para hacer la clase serializable
 
-@Serializable
-data class SimpleAlbum(
-    val id: String,
-    val name: String,
-    @SerialName("album_type") val albumType: String,
-    val artists: List<SimpleArtist>,
-    @SerialName("release_date") val releaseDate: String? = null,
-    @SerialName("total_tracks") val totalTracks: Int = 0,
-    val images: List<Image> = emptyList(),
-    @SerialName("external_urls") val externalUrls: ExternalUrls? = null
+@Serializable // marca que esta clase puede convertirse a/desde json
+data class SimpleAlbum( // version simplificada de album
+    val id: String, // id unico del album
+    val name: String, // nombre del album
+    @SerialName("album_type") val albumType: String, // tipo de album
+    val artists: List<SimpleArtist>, // lista de artistas
+    @SerialName("release_date") val releaseDate: String? = null, // fecha de lanzamiento, puede ser null
+    @SerialName("total_tracks") val totalTracks: Int = 0, // cantidad de canciones, por defecto 0
+    val images: List<Image> = emptyList(), // lista de imagenes, por defecto vacia
+    @SerialName("external_urls") val externalUrls: ExternalUrls? = null // urls externas, puede ser null
 )
