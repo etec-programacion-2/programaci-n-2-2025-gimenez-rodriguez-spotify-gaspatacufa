@@ -14,6 +14,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import java.util.*
 
+// cliente para interactuar con la api de spotify
 class SpotifyApiClient(val clientId: String, val clientSecret: String) {
     
     private val jsonParser = Json {
@@ -31,6 +32,7 @@ class SpotifyApiClient(val clientId: String, val clientSecret: String) {
     private var accessToken: String? = null
     private var tokenType: String? = null
     
+    // obtiene el token de acceso de spotify
     suspend fun authenticate(): Boolean {
         return try {
             println("Obteniendo access token")
@@ -60,6 +62,7 @@ class SpotifyApiClient(val clientId: String, val clientSecret: String) {
         }
     }
     
+    // obtiene info de un artista desde spotify
     suspend fun getArtist(artistId: String): Artist? {
         return try {
             println("\n🔍 Obteniendo informacion del artista...")
@@ -90,6 +93,7 @@ class SpotifyApiClient(val clientId: String, val clientSecret: String) {
         }
     }
     
+    // obtiene info de una cancion desde spotify
     suspend fun getTrack(trackId: String): Track? {
         return try {
             println("\n🔍 Obteniendo informacion de la cancion...")
@@ -120,6 +124,7 @@ class SpotifyApiClient(val clientId: String, val clientSecret: String) {
         }
     }
     
+    // obtiene info de un album desde spotify
     suspend fun getAlbum(albumId: String): Album? {
         return try {
             println("\n🔍 Obteniendo informacion del album...")
@@ -150,6 +155,7 @@ class SpotifyApiClient(val clientId: String, val clientSecret: String) {
         }
     }
     
+    // obtiene info de una playlist desde spotify
     suspend fun getPlaylist(playlistId: String): Playlist? {
         return try {
             println("\n🔍 Obteniendo informacion de la playlist...")
