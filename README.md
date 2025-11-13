@@ -24,7 +24,7 @@ git clone git@github.com:etec-programacion-2/programaci-n-2-2025-gimenez-rodrigu
 
 Paso 2: Ejecucion
 
-Modo Consola, Ejecuar:
+Modo Consola, Ejecutar:
 
 gradle run
 
